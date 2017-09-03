@@ -82,7 +82,14 @@ def parse_args():
         "-dE",
         "--deauth-essid",
         help=("Deauth all the BSSIDs having same ESSID from AP selection or " +
-              "the ESSID given by -e option" 
+              "the ESSID given by -e option"
+              ),
+        action='store_true')
+    parser.add_argument(
+        "-cM",
+        "--channel-monitor",
+        help=("Frequency hopping to check if the channel is changing for the " +
+              "target access points"
               ),
         action='store_true')
     parser.add_argument(
@@ -551,7 +558,6 @@ class WifiphisherEngine:
         """
 
         return self.op_mode in [OP_MODE1, OP_MODE2]
-
 
     def stop(self):
         if DEV:

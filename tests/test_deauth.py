@@ -28,6 +28,7 @@ class TestDeauth(unittest.TestCase):
         self.target_essid = "Evil"
         self.args = mock.Mock()
         self.args.deauth_essid = False
+        self.args.channel_monitor = False
 
         data0 = custom_tuple(self.target_bssid, self.target_channel, self.rogue_mac,
                              self.args, self.target_essid)
@@ -38,8 +39,8 @@ class TestDeauth(unittest.TestCase):
         self.deauth_obj1 = deauth.Deauth(data1)
 
         # test for --deauth-essid
-        self.deauth_obj0._deauth_bssids = set()
-        self.deauth_obj1._deauth_bssids = set()
+        self.deauth_obj0._deauth_bssids = dict()
+        self.deauth_obj1._deauth_bssids = dict()
 
     def test_craft_packet_normal_expected(self):
         """
@@ -207,7 +208,7 @@ class TestDeauth(unittest.TestCase):
         self.packet.addr3 = bssid0
 
         # add target_bssid in the self._deauth_bssids
-        self.deauth_obj0._deauth_bssids.add(self.target_bssid)
+        self.deauth_obj0._deauth_bssids[self.target_bssid] = self.target_channel
 
         # run the method
         result0 = self.deauth_obj0.get_packet(self.packet)
@@ -292,7 +293,7 @@ class TestDeauth(unittest.TestCase):
         self.packet.addr3 = bssid
 
         # add the bssid to the deauth_bssid set
-        self.deauth_obj1._deauth_bssids.add(bssid)
+        self.deauth_obj1._deauth_bssids[bssid] = self.target_channel
 
         # run the method
         result = self.deauth_obj1.get_packet(self.packet)
@@ -640,7 +641,7 @@ class TestDeauth(unittest.TestCase):
         self.packet.addr3 = bssid
 
         # run the method
-        self.deauth_obj1._deauth_bssids.add(bssid)
+        self.deauth_obj1._deauth_bssids[bssid] = str(1)
         self.deauth_obj1.get_packet(self.packet)
         actual = self.deauth_obj1.send_output()
         expected = "DEAUTH/DISAS - {}".format(sender)
@@ -670,7 +671,7 @@ class TestDeauth(unittest.TestCase):
         self.packet.addr3 = bssid0
 
         # run the method
-        self.deauth_obj1._deauth_bssids.add(bssid0)
+        self.deauth_obj1._deauth_bssids[bssid0] = str(1)
         self.deauth_obj1.get_packet(self.packet)
 
         # change the packet details
@@ -679,7 +680,7 @@ class TestDeauth(unittest.TestCase):
         self.packet.addr3 = bssid1
 
         # run the method again
-        self.deauth_obj1._deauth_bssids.add(bssid1)
+        self.deauth_obj1._deauth_bssids[bssid1] = str(1)
         self.deauth_obj1.get_packet(self.packet)
 
         actual = self.deauth_obj1.send_output()
